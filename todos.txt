@@ -1,3 +1,4 @@
 # google drive upload
+# create github repo -> Done
 # try-catch and log errors -> Done, just in one try-except block for whole script
 # refactor
