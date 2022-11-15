@@ -1,0 +1,32 @@
+root - INFO - Testing the logger
+root - INFO - List of directories to zip: ['H:\\wifi_pwds', 'C:\\Users\\Angel\\Desktop\\destino_heidelberg']
+root - INFO - Finished zipping: H:\wifi_pwds
+root - INFO - Contents of zipped file: H:\wifi_pwds
+root - INFO - hotspot_apanillo.txt
+root - INFO - hotspot_iphoneBosch.txt
+root - INFO - pwdAppleId.txt
+root - INFO - wifi_AndreaPasaje.txt
+root - INFO - wifi_anita.txt
+root - INFO - wifi_Buelent.txt
+root - INFO - wifi_mariaJesusSeguro.txt
+root - INFO - wifi_Solitudeallee.txt
+root - INFO - ----------------------------------
+root - INFO - Finished zipping: C:\Users\Angel\Desktop\destino_heidelberg
+root - INFO - Contents of zipped file: C:\Users\Angel\Desktop\destino_heidelberg
+root - INFO - 20221021_conciertoCafeDelMundoheidelberg.pdf
+root - INFO - Anfaengerbroschuere.pdf
+root - INFO - umzug_nachweise/
+root - INFO - umzug_nachweise/20190411_schufa_salces.pdf
+root - INFO - umzug_nachweise/Entgeltabrechnung_2022_05.pdf
+root - INFO - umzug_nachweise/Entgeltabrechnung_2022_06.pdf
+root - INFO - umzug_nachweise/Entgeltabrechnung_2022_07.pdf
+root - INFO - umzug_nachweise/Entgeltabrechnung_2022_08.pdf
+root - INFO - umzug_nachweise/nachrichtFuerVerMieter.txt
+root - INFO - umzug_nachweise/pantallazo_schufa_solicitada.JPG
+root - INFO - umzug_nachweise/reisepass_salces.pdf
+root - INFO - umzug_nachweise/SCHUFA_-Antrag-deutsch.pdf
+root - INFO - umzug_nachweise/schufa_beantragen.txt
+root - INFO - umzug_nachweise/Thumbs.db
+root - INFO - ----------------------------------
+root - INFO - All folders zipped correctly
+root - INFO - Finished OK

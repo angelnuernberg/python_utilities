@@ -1,0 +1,3 @@
+directory
+H:\wifi_pwds
+C:\Users\Angel\Desktop\destino_heidelberg
