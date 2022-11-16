@@ -1,6 +1,10 @@
 import pandas as pd
 import logging
 import config
+import logging_utility
+import zip_utilities
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
 
 # https://www.youtube.com/watch?v=ZI4XjwbpEwU
 # https://github.com/aluna1997/Python_and_PyDrive2/blob/main/GoogleDrivePyDrive.py
@@ -33,36 +37,17 @@ import config
 #                   (Contains credentials for automatic authentication)
 
 
+# TODO: Refactoring to CLASS?: to have as inner property gdrive, but the benefit is not that big...
+#               Also for including logger in class
 
-# client_id=oath_credentials.client_id
-# client_secret=oath_credentials.client_secret
+def registerToGdriveInitialConfiguration():
+    # This needs to be done the first time -> a browser opens, you enter your google
+    # login, you need to confirm to trust the app
+    # If it worked OK, you get the message "Authentication successful"
+    # however, this authentication is temporal : to persist credentials, a settings.yaml file needs to be defined
+    gauth=GoogleAuth()
+    gauth.LocalWebserverAuth()
 
-from pydrive2.auth import GoogleAuth
-from pydrive2.drive import GoogleDrive
-
-path_to_credentials_module = config.path_to_credentials_module
-
-def configure_logging(logfile):
-    # https: // realpython.com / python - logging /
-    # logging.debug('This is a debug message')
-    # logging.info('This is an info message')
-    # logging.warning('This is a warning message')
-    # logging.error('This is an error message')
-    # logging.critical('This is a critical message')
-    # This does not work:
-    #       logging.basicConfig(filename=logfile, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
-
-
-    # Create a custom logger
-    # From https://realpython.com/python-logging/
-    logger_intern=logging.getLogger()
-    logger_intern.setLevel(logging.INFO)
-    file_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    file_handler=logging.FileHandler(logfile, 'w')
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(file_format)
-    logger_intern.addHandler(file_handler)
-    return logger_intern
 
 def login_to_gdrive(path_to_credentials_module):
     gauth = GoogleAuth()
@@ -90,29 +75,17 @@ def upload_file_to_gdrive(gdrive, file_path, id_folder):
     print(f"File uploaded: {file_path}")
     logging.info(f"File uploaded: {file_path}")
 
-def upload_files_to_gdrive(listOfFilePaths, id_folder):
-    gdrive = login_to_gdrive(config.path_to_credentials_module)
+def upload_files_to_gdrive(gdrive, listOfFilePaths, id_folder):
+    # gdrive = login_to_gdrive(config.path_to_credentials_module)
     for filepath in listOfFilePaths:
         upload_file_to_gdrive(gdrive,filepath,id_folder)
     logging.info("--------- upload_files_to_gdrive -------------")
     print(f'All files uploaded OK')
     logging.info(f'All files uploaded OK')
 
-def fetchDirectoriesToZip(fileListDirectories):
-    file=open(fileListDirectories,'r')
-    # return file.readlines()
-    #   This works OK!!
-    #   return [r'U:\trainM_courses', r'C:\Users\AAL7FE\Desktop\respaldo']
-    dataframe = pd.read_csv(fileListDirectories, delimiter=",")
-    listDirectories = dataframe["directory"]
-    print(f'Display column with name: directory:\n\r{listDirectories}')
-    logging.info("--------- fetchDirectoriesToZip -------------")
-    logging.info(f'Display column with name: directory:{listDirectories.to_list()}')
-    return listDirectories.to_list()
-
 # DESCARGAR UN ARCHIVO DE DRIVE POR ID
-def bajar_archivo_por_id(id_drive,ruta_descarga):
-    credenciales =login_to_gdrive(config.path_to_credentials_module)
+def bajar_archivo_por_id(credenciales, id_drive,ruta_descarga):
+    # credenciales =login_to_gdrive(config.path_to_credentials_module)
     archivo = credenciales.CreateFile({'id': id_drive})
     nombre_archivo = archivo['title']
     archivo.GetContentFile(ruta_descarga + nombre_archivo)
@@ -121,9 +94,9 @@ def bajar_archivo_por_id(id_drive,ruta_descarga):
     logging.info(f'File downloaded OK: {ruta_descarga}{nombre_archivo}')
 
 # DESCARGAR UN ARCHIVO DE DRIVE POR NOMBRE
-def bajar_acrchivo_por_nombre(nombre_archivo,ruta_descarga):
+def bajar_acrchivo_por_nombre(credenciales, nombre_archivo,ruta_descarga):
     logging.info("--------- bajar_archivo_por_nombre -------------")
-    credenciales = login_to_gdrive(config.path_to_credentials_module)
+    # credenciales = login_to_gdrive(config.path_to_credentials_module)
     lista_archivos = credenciales.ListFile({'q': "title = '" + nombre_archivo + "'"}).GetList()
     if not lista_archivos:
         print('No se encontro el archivo: ' + nombre_archivo)
@@ -134,43 +107,50 @@ def bajar_acrchivo_por_nombre(nombre_archivo,ruta_descarga):
     print(f'File downloaded OK: {ruta_descarga}{nombre_archivo}')
     logging.info(f'File downloaded OK: {ruta_descarga}{nombre_archivo}')
 
-id_folder = '1NN6uOxAm-h2DCrlNobo_2hZcGONc2szX'  # Id of folder 'backup_wv'
-# to get Id_folder, go to 'get link' for the folder, copy the url at browser
-#  and extract the id
 
-def test_upload_one_file(gdrive,id_folder):
+
+def test_upload_one_file(gdrive,file_path,id_folder):
     # TEST upload one file: works OK
-    file_path = 'requirements.txt'
+    # file_path = 'requirements.txt'
     upload_file_to_gdrive(gdrive,file_path, id_folder)
 
-def test_upload_list_files():
+def test_upload_list_files(gdrive, listOfFiles, id_folder):
     # TEST upload list of files to Gdrive -> works OK!
-    upload_files_to_gdrive(fetchDirectoriesToZip('directoriesListGDrive.txt'),id_folder)
+    # upload_files_to_gdrive(gdrive, fetchDirectoriesToZip('directoriesListGDrive.txt'),id_folder)
+    upload_files_to_gdrive(gdrive, listOfFiles, id_folder)
 
-def test_download_file_by_id():
+def test_download_file_by_id(gdrive, id_file, ruta_descarga):
     # TEST download file by id: Works OK!
-    id_file='1rZJnwoBvBcJxKJerU0fjdZvTa-N3S2cm'
+    # id_file='1rZJnwoBvBcJxKJerU0fjdZvTa-N3S2cm'
     # ruta_descarga='' # To download to same directory of script
-    ruta_descarga=r'C:/Users/Angel/Desktop/scooter/'
+    # ruta_descarga=r'C:/Users/Angel/Desktop/scooter/'
     # ruta_descarga=r'H:/FiestaAbschlussBWM/'
         # Importante: utilizar / para ruta descarga e incluir / al final!
-    bajar_archivo_por_id(id_file,ruta_descarga)
+    bajar_archivo_por_id(gdrive, id_file,ruta_descarga)
     print("finished OK")
 
-def test_bajar_archive_por_nombre():
-    nombre_archivo='destino_heidelberg15.zip'
-    ruta_descarga=r'H:/FiestaAbschlussBWM/'
-    bajar_acrchivo_por_nombre(nombre_archivo,ruta_descarga)
+def test_bajar_archive_por_nombre(gdrive, nombre_archivo, ruta_descarga):
+    # nombre_archivo='destino_heidelberg15.zip'
+    # ruta_descarga=r'H:/FiestaAbschlussBWM/'
+    bajar_acrchivo_por_nombre(gdrive, nombre_archivo,ruta_descarga)
 
 
-# MAIN:
-try:
-    logger = configure_logging(config.log_file)
-    gdrive = login_to_gdrive(config.path_to_credentials_module)
-    test_upload_one_file(gdrive,id_folder)
-    test_upload_list_files()
-    test_download_file_by_id()
-    test_bajar_archive_por_nombre()
-    print('Finished OK ')
-except Exception as e:
-    logging.exception(e)
+# MAIN
+def main_method():
+    try:
+        # path_to_credentials_module = config.path_to_credentials_module
+        logger = logging_utility.configure_logging(config.log_file)
+        gdrive = login_to_gdrive(config.path_to_credentials_module)
+        id_folder = '1NN6uOxAm-h2DCrlNobo_2hZcGONc2szX'  # Id of folder 'backup_wv'
+             # to get Id_folder, go to 'get link' for the folder, copy the url at browser and extract the id
+        test_upload_one_file(gdrive,'requirements.txt', '1NN6uOxAm-h2DCrlNobo_2hZcGONc2szX')
+        test_upload_list_files(gdrive,zip_utilities.fetchListDirectoriesFromFile('directoriesListGDrive.txt'),'1NN6uOxAm-h2DCrlNobo_2hZcGONc2szX' )
+        test_download_file_by_id(gdrive,'1rZJnwoBvBcJxKJerU0fjdZvTa-N3S2cm',r'C:/Users/Angel/Desktop/scooter/')
+        test_bajar_archive_por_nombre(gdrive, 'destino_heidelberg.zip',r'H:/FiestaAbschlussBWM/')
+        print('Finished OK ')
+        logging.info('Script finished OK')
+    except Exception as e:
+        logging.exception(e)
+
+
+# main_method()

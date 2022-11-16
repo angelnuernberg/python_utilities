@@ -1,4 +1,5 @@
 import logging
+import logging_utility
 
 import random
 
@@ -10,27 +11,10 @@ import config
 import pandas as pd
 import matplotlib.pyplot as plt
 
-def configure_logging(logfile):
-    # https: // realpython.com / python - logging /
-    # logging.debug('This is a debug message')
-    # logging.info('This is an info message')
-    # logging.warning('This is a warning message')
-    # logging.error('This is an error message')
-    # logging.critical('This is a critical message')
-    # This does not work:
-    #       logging.basicConfig(filename=logfile, filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+# TODO: Refactoring to CLASS?: to have as inner property or in constructor
+#  the filaname, delimiter, dataframe... This would make sense to instantiate the csv reader
+#   in the constructor
 
-
-    # Create a custom logger
-    # From https://realpython.com/python-logging/
-    logger_intern=logging.getLogger()
-    logger_intern.setLevel(logging.INFO)
-    file_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-    file_handler=logging.FileHandler(logfile, 'w')
-    file_handler.setLevel(logging.INFO)
-    file_handler.setFormatter(file_format)
-    logger_intern.addHandler(file_handler)
-    return logger_intern
 
 def print_hi(name):
     # Use a breakpoint in the code line below to debug your script.
@@ -176,11 +160,12 @@ def plot(dataframe):
 
 
 # Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+# if __name__ == '__main__':
+def main_method():
     try:
         print_hi('PyCharm')
         # logger=configure_logging('log.txt')
-        logger=configure_logging(config.log_file)
+        logger=logging_utility.configure_logging(config.log_file)
         logger.info("Testing the logger")
         # file_name = 'username2.csv'
         file_name=config.file_name
@@ -210,4 +195,4 @@ if __name__ == '__main__':
     except Exception as e:
         logging.exception(e)
 
-
+# main_method()

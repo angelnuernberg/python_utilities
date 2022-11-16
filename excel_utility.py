@@ -1,5 +1,6 @@
 # Very useful: https://realpython.com/openpyxl-excel-spreadsheets-python/
 
+# TODO: to be refactored
 from openpyxl import load_workbook
 workbook = load_workbook(filename="reviews-sample.xlsx")
 print(workbook.sheetnames)
