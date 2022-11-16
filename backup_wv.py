@@ -18,15 +18,35 @@ def main_method():
     except Exception as e:
         logging.exception(e)
 
-
+#-------------------------------------------------------------------
+# FUNCTIONS findListZipsFromDirectories, findListZipsFromDirectoriesOptimized, findListZipsFromDirectoriesOptimizedWithLambda
+# are equivalent -
 def findListZipsFromDirectories(fileWithDirectories):
     listDirectories = zip_utilities.fetchListDirectoriesFromFile(fileWithDirectories)
     listZipsToUpload = []
     for directory in listDirectories:
         listZipsToUpload.append(str(directory) + '.zip')
+    print("first version:" + str(listZipsToUpload))
     return listZipsToUpload
 
 
+def findListZipsFromDirectoriesOptimized(fileWithDirectories):
+    listDirectories = zip_utilities.fetchListDirectoriesFromFile(fileWithDirectories)
+    # WAY 2: Using one-liner -> UNIQUE IN PYTHON (cool!)
+    listZipsToUpload=[i+'.zip' for i in listDirectories]
+    print("optimized version:" + str(listZipsToUpload))
+    return listZipsToUpload
+
+
+def findListZipsFromDirectoriesOptimizedWithLambda(fileWithDirectories):
+    listDirectories = zip_utilities.fetchListDirectoriesFromFile(fileWithDirectories)
+    # WAY 3: Using map and lambda:
+    listZipsToUpload=list(map(lambda file:file+'.zip',listDirectories))
+    print("optimized version with map and lambda:" + str(listZipsToUpload))
+    return listZipsToUpload
+
+# ------------------------------------------------------------------------
 main_method()
+
 
 
